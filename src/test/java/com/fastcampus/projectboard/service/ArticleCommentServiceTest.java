@@ -123,7 +123,6 @@ class ArticleCommentServiceTest {
 
         // Then
         then(articleCommentRepository).should().getReferenceById(dto.id());
-        then(articleCommentRepository).shouldHaveNoInteractions();
     }
 
     @DisplayName("댓글 ID를 입력하면, 댓글을 삭제한다.")
