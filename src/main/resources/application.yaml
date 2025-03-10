@@ -6,7 +6,7 @@ management:
         include: "*"
 logging:
   level:
-    com.fastcampus.projectboard: debug
+    com.springboard.projectboard: debug
     org.springframework.web.servlet: debug
     org.hibernate.type.descriptor.sql.BasicBinder: trace
 
