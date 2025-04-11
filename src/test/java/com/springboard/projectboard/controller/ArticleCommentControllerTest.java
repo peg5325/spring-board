@@ -1,6 +1,6 @@
 package com.springboard.projectboard.controller;
 
-import com.springboard.projectboard.config.SecurityConfig;
+import com.springboard.projectboard.config.TestSecurityConfig;
 import com.springboard.projectboard.dto.ArticleCommentDto;
 import com.springboard.projectboard.dto.request.ArticleCommentRequest;
 import com.springboard.projectboard.service.ArticleCommentService;
@@ -12,6 +12,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.TestExecutionEvent;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Map;
@@ -24,7 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @DisplayName("View 컨트롤러 - 댓글")
-@Import({SecurityConfig.class, FormDataEncoder.class})
+@Import({TestSecurityConfig.class, FormDataEncoder.class})
 @WebMvcTest(ArticleCommentController.class)
 class ArticleCommentControllerTest {
 
@@ -42,6 +44,7 @@ class ArticleCommentControllerTest {
         this.formDataEncoder = formDataEncoder;
     }
 
+    @WithUserDetails(value = "eongyuTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[view][POST] 댓글 등록 - 정상호출")
     @Test
     void givenArticleCommentInfo_whenRequesting_thenSavesNewArticleComment() throws Exception {
@@ -65,36 +68,16 @@ class ArticleCommentControllerTest {
         then(articleCommentService).should().saveArticleComment(any(ArticleCommentDto.class));
     }
 
-//    @DisplayName("[view][GET] 댓글 삭제 - 정상 호출")
-//    @Test
-//    void givenArticleCommentIdToDelete_whenRequesting_thenDeletesArticleComment() throws Exception {
-//        // Given
-//        long articleId = 1L;
-//        long articleCommentId = 1L;
-//
-//        willDoNothing().given(articleCommentService).deleteArticleComment(articleCommentId);
-//
-//        // When & Then
-//        mvc.perform(
-//                post("/comments/"+ articleCommentId + "/delete")
-//                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-//                        .content(formDataEncoder.encode(Map.of("articleId", articleId)))
-//                        .with(csrf())
-//        )
-//                .andExpect(status().is3xxRedirection())
-//                .andExpect(view().name("redirect:/articles/" + articleId))
-//                .andExpect(redirectedUrl("/articles/" + articleId));
-//
-//
-//        then(articleCommentService).should().deleteArticleComment(articleCommentId);
-//    }
+    @WithUserDetails(value = "eongyuTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[view][GET] 댓글 삭제 - 정상 호출")
     @Test
     void givenArticleCommentIdToDelete_whenRequesting_thenDeletesArticleComment() throws Exception {
         // Given
         long articleId = 1L;
         long articleCommentId = 1L;
-        willDoNothing().given(articleCommentService).deleteArticleComment(articleCommentId);
+        String userId = "eongyuTest";
+
+        willDoNothing().given(articleCommentService).deleteArticleComment(articleCommentId, userId);
 
         // When & Then
         mvc.perform(
@@ -106,6 +89,6 @@ class ArticleCommentControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/articles/" + articleId))
                 .andExpect(redirectedUrl("/articles/" + articleId));
-        then(articleCommentService).should().deleteArticleComment(articleCommentId);
+        then(articleCommentService).should().deleteArticleComment(articleCommentId, userId);
     }
 }
