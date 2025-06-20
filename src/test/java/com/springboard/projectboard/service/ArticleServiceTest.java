@@ -216,7 +216,7 @@ class ArticleServiceTest {
         ArticleDto dto = createArticleDto("새 타이틀", "새 내용", "#springboot");
 
         given(articleRepository.getReferenceById(dto.id())).willReturn(article);
-        given(userAccountRepository.getReferenceById(dto.userAccountDto().userId())).willReturn(dto.userAccountDto().toEntity());
+        given(userAccountRepository.findById(dto.userAccountDto().userId())).willReturn(Optional.of(dto.userAccountDto().toEntity()));
 
         // When
         sut.updateArticle(dto.id(), dto);
@@ -228,7 +228,7 @@ class ArticleServiceTest {
                 .hasFieldOrPropertyWithValue("hashtag", dto.hashtag());
 
         then(articleRepository).should().getReferenceById(dto.id());
-        then(userAccountRepository).should().getReferenceById(dto.userAccountDto().userId());
+        then(userAccountRepository).should().findById(dto.userAccountDto().userId());
     }
 
     @DisplayName("없는 게시글의 수정 정보를 입력하면, 경고 로그를 찍고 아무것도 하지 않는다.")
