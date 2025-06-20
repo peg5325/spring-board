@@ -63,7 +63,9 @@ public class ArticleService {
     public void updateArticle(Long articleId, ArticleDto dto) {
         try {
             Article article = articleRepository.getReferenceById(articleId);
-            UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDto().userId());
+            UserAccount userAccount = userAccountRepository
+                    .findById(dto.userAccountDto().userId())
+                    .orElseThrow(() -> new EntityNotFoundException("사용자 계정을 찾을 수 없습니다."));
 
             if (article.getUserAccount().equals(userAccount)) {
                 if (dto.title() != null) { article.setTitle(dto.title()); }
