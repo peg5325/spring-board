@@ -31,10 +31,12 @@ Spring Boot
 
 * QueryDSL 5.0.0
 * Bootstrap 5.2.0-Beta1
+* AWS EC2
+* AWS Route53
 
 ## Demo
 
-(작성 중)
+https://egpark-edu.link
 
 ## 질문, 건의
 
