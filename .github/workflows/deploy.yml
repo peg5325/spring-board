@@ -39,8 +39,14 @@ jobs:
       - name: application.yml 파일 만들기
         run: echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.yml
 
-      - name: 테스트 및 빌드하기
-        run: ./gradlew clean build
+      - name: application-test.yml 파일 만들기
+        run: echo "${{ secrets.APPLICATION_TEST_PROPERTIES }}" > ./src/main/resources/application-test.yml
+
+      - name: Run Tests
+        run: ./gradlew test -Dspring.profiles.active=test
+
+      - name: Build
+        run: ./gradlew clean build -x test
 
       - name: 빌드된 파일 이름 변경하기
         run: mv ./build/libs/*SNAPSHOT.jar ./project.jar
