@@ -2,7 +2,6 @@ name: Deploy To EC2 (TEST)
 
 on:
   pull_request:
-    types: [synchronize]
     branches:
       - main
 
