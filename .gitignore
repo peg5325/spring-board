@@ -2,7 +2,8 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=intellij+all,macos,windows,eclipse,java,gradle,visualstudiocode
 
 ### Project
-application.yaml
+application.yml
+application-test.yml
 
 ### Querydsl
 /src/main/generated
