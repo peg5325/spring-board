@@ -37,10 +37,16 @@ jobs:
           java-version: 17
 
       - name: application.yml 파일 만들기
-        run: printf "%s" "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.yml
+        run: |
+          cat <<EOF > ./src/main/resources/application.yml
+          ${{ secrets.APPLICATION_PROPERTIES }}
+          EOF
 
       - name: application-test.yml 파일 만들기
-        run: printf "%s" "${{ secrets.APPLICATION_TEST_PROPERTIES }}" > ./src/main/resources/application-test.yml
+        run: |
+          cat <<EOF > ./src/main/resources/application-test.yml
+          ${{ secrets.APPLICATION_TEST_PROPERTIES }}
+          EOF
 
       - name: Run Tests
         run: ./gradlew test -Dspring.profiles.active=test
