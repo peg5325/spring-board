@@ -37,8 +37,8 @@ Spring Boot
 
 ## Demo
 
-현재 회원가입이 없습니다. 차후 소셜로그인 형태로 추가할 예정입니다.
-https://egpark-edu.link
+* 현재 회원가입이 없습니다. 차후 소셜로그인 형태로 추가할 예정입니다.
+* https://egpark-edu.link
 
 ## 질문, 건의
 
