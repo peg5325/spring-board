@@ -12,7 +12,7 @@ import java.util.Set;
 
 @RepositoryRestResource
 public interface HashtagRepository extends
-        JpaRepository<Hashtag, String>,
+        JpaRepository<Hashtag, Long>,
         HashtagRepositoryCustom,
         QuerydslPredicateExecutor<Hashtag>
 {
