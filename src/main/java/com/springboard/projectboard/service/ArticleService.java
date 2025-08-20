@@ -16,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import javax.persistence.EntityNotFoundException;
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +34,7 @@ public class ArticleService {
     private final ArticleRepository articleRepository;
     private final UserAccountRepository userAccountRepository;
     private final HashtagRepository hashtagRepository;
+    private final ArticleFileService articleFileService;
 
     @Transactional(readOnly = true)
     public Page<ArticleDto> searchArticles(SearchType searchType, String searchKeyword, Pageable pageable) {
@@ -66,6 +69,12 @@ public class ArticleService {
                 .orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다 - articleId: " + articleId));
     }
 
+    @Transactional(readOnly = true)
+    public Article getArticleEntity(Long articleId) {
+        return articleRepository.findById(articleId)
+                .orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다 - articleId: " + articleId));
+    }
+
     public void saveArticle(ArticleDto dto) {
         UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDto().userId());
         Set<Hashtag> hashtags = renewHashtagsFromContent(dto.content());
@@ -74,6 +83,17 @@ public class ArticleService {
         article.addHashtags(hashtags);
 
         articleRepository.save(article);
+    }
+
+    public void saveArticleWithFiles(ArticleDto dto, List<MultipartFile> files) {
+        UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDto().userId());
+        Set<Hashtag> hashtags = renewHashtagsFromContent(dto.content());
+
+        Article article = dto.toEntity(userAccount);
+        article.addHashtags(hashtags);
+        Article savedArticle = articleRepository.save(article);
+
+        articleFileService.saveArticleFiles(savedArticle, files);
     }
 
     public void updateArticle(Long articleId, ArticleDto dto) {
@@ -109,6 +129,7 @@ public class ArticleService {
                 .map(Hashtag::getId)
                 .collect(Collectors.toUnmodifiableSet());
 
+        articleFileService.deleteArticleFiles(articleId);
         articleRepository.deleteByIdAndUserAccount_UserId(articleId, userId);
         articleRepository.flush();
 
