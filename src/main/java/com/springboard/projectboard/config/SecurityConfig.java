@@ -40,8 +40,10 @@ public class SecurityConfig {
                                 "/",
                                 "/health",
                                 "/articles",
-                                "/articles/search-hashtag"
+                                "/articles/search-hashtag",
+                                "/files/download/**"
                         ).permitAll()
+                        .mvcMatchers(HttpMethod.DELETE, "/files/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin(withDefaults())
