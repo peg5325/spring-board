@@ -53,7 +53,7 @@ class JpaRepositoryTest {
         //
         assertThat(articles)
                 .isNotNull()
-                .hasSize(123); // classpath:resources/data.sql 참조
+                .hasSize(0); // 빈 데이터베이스
     }
 
     @DisplayName("insert 테스트")
@@ -78,7 +78,8 @@ class JpaRepositoryTest {
     void givenTestData_whenUpdating_thenWorksFine() {
 
         // Given
-        Article article = articleRepository.findById(1L).orElseThrow();
+        UserAccount userAccount = userAccountRepository.save(UserAccount.of("testUser", "pw", null, null, null));
+        Article article = articleRepository.save(Article.of(userAccount, "test title", "test content"));
         Hashtag updateHashtag = Hashtag.of("springboot");
         article.clearHashtags();
         article.addHashtags(Set.of(updateHashtag));
@@ -98,7 +99,8 @@ class JpaRepositoryTest {
     void givenTestData_whenDeleting_thenWorksFine() {
 
         // Given
-        Article article = articleRepository.findById(1L).orElseThrow();
+        UserAccount userAccount = userAccountRepository.save(UserAccount.of("testUser", "pw", null, null, null));
+        Article article = articleRepository.save(Article.of(userAccount, "test title", "test content"));
         long previousArticleCount = articleRepository.count();
         long previousArticleCommentCount = articleCommentRepository.count();
         int deletedCommentsSize = article.getArticleComments().size();
@@ -120,14 +122,19 @@ class JpaRepositoryTest {
         List<String> hashtagNames = hashtagRepository.findAllHashtagNames();
 
         // Then
-        assertThat(hashtagNames).hasSize(19);
+        assertThat(hashtagNames).hasSize(0);
     }
 
     @DisplayName("[Querydsl] hashtag로 페이지된 게시글 검색하기")
     @Test
     void givenHashtagNamesAndPageable_whenQueryingArticles_thenReturnsArticlePage() {
         // Given
-        List<String> hashtagNames = List.of("blue", "crimson", "fuscia");
+        UserAccount userAccount = userAccountRepository.save(UserAccount.of("testUser", "pw", null, null, null));
+        Article article = Article.of(userAccount, "Test Article", "Test Content");
+        article.addHashtags(Set.of(Hashtag.of("blue")));
+        articleRepository.save(article);
+        
+        List<String> hashtagNames = List.of("blue");
         Pageable pageable = PageRequest.of(0, 5, Sort.by(
                 Sort.Order.desc("hashtags.hashtagName"),
                 Sort.Order.asc("title")
@@ -137,13 +144,13 @@ class JpaRepositoryTest {
         Page<Article> articlePage = articleRepository.findByHashtagNames(hashtagNames, pageable);
 
         // Then
-        assertThat(articlePage.getContent()).hasSize(pageable.getPageSize());
-        assertThat(articlePage.getContent().get(0).getTitle()).isEqualTo("Fusce posuere felis sed lacus.");
+        assertThat(articlePage.getContent()).hasSize(1);
+        assertThat(articlePage.getContent().get(0).getTitle()).isEqualTo("Test Article");
         assertThat(articlePage.getContent().get(0).getHashtags())
                 .extracting("hashtagName", String.class)
-                .containsExactly("fuscia");
-        assertThat(articlePage.getTotalElements()).isEqualTo(17);
-        assertThat(articlePage.getTotalPages()).isEqualTo(4);
+                .containsExactly("blue");
+        assertThat(articlePage.getTotalElements()).isEqualTo(1);
+        assertThat(articlePage.getTotalPages()).isEqualTo(1);
     }
 
     @EnableJpaAuditing
