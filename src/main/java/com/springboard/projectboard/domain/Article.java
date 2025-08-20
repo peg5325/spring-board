@@ -51,6 +51,11 @@ public class Article extends AuditingFields {
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     private final Set<ArticleComment> articleComments = new LinkedHashSet<>();
 
+    @ToString.Exclude
+    @OrderBy("displayOrder ASC")
+    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final Set<ArticleFile> articleFiles = new LinkedHashSet<>();
+
 
     protected Article() {}
 
