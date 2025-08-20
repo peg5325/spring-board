@@ -43,8 +43,12 @@
             </attr>
 
             <attr sel="tbody" th:remove="all-but-first">
-                <attr sel="tr[0]" th:each="article : ${articles}">
-                    <attr sel="td.title/a" th:text="${article.title}" th:href="@{'/articles/' + ${article.id}}" />
+                <attr sel="tr[0]" th:each="article, iterStat : ${articles}">
+                    <attr sel="td[0]" th:text="${articles.totalElements - (articles.number * articles.size) - iterStat.index}" />
+                    <attr sel="td.title">
+                        <attr sel="a" th:text="${article.title}" th:href="@{'/articles/' + ${article.id}}" />
+                        <attr sel="img" th:if="${article.hasFiles}" th:remove="${!article.hasFiles} ? 'all' : 'none'" />
+                    </attr>
                     <attr sel="td.hashtag/span" th:each="hashtag : ${article.hashtags}">
                         <attr sel="a"
                               th:text="'#' + ${hashtag}"
