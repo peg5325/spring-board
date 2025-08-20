@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("JPA 연결 테스트")
 @Import(JpaRepositoryTest.TestJpaConfig.class)
 @DataJpaTest
+@Sql(statements = {
+    "CREATE TABLE IF NOT EXISTS user_account (user_id VARCHAR(50) PRIMARY KEY, user_password VARCHAR(255), email VARCHAR(100), nickname VARCHAR(100), memo TEXT, created_at TIMESTAMP, created_by VARCHAR(100), modified_at TIMESTAMP, modified_by VARCHAR(100))",
+    "CREATE TABLE IF NOT EXISTS article (id BIGINT AUTO_INCREMENT PRIMARY KEY, user_id VARCHAR(50), title VARCHAR(255), content TEXT, created_at TIMESTAMP, created_by VARCHAR(100), modified_at TIMESTAMP, modified_by VARCHAR(100))",
+    "CREATE TABLE IF NOT EXISTS hashtag (id BIGINT AUTO_INCREMENT PRIMARY KEY, hashtag_name VARCHAR(100) UNIQUE, created_at TIMESTAMP, created_by VARCHAR(100), modified_at TIMESTAMP, modified_by VARCHAR(100))",
+    "CREATE TABLE IF NOT EXISTS article_hashtag (article_id BIGINT, hashtag_id BIGINT, PRIMARY KEY (article_id, hashtag_id))",
+    "CREATE TABLE IF NOT EXISTS article_comment (id BIGINT AUTO_INCREMENT PRIMARY KEY, article_id BIGINT, user_id VARCHAR(50), parent_comment_id BIGINT, content TEXT, created_at TIMESTAMP, created_by VARCHAR(100), modified_at TIMESTAMP, modified_by VARCHAR(100))"
+})
 class JpaRepositoryTest {
 
     private final ArticleRepository articleRepository;
