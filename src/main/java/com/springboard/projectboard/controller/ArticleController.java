@@ -70,7 +70,8 @@ public class ArticleController {
         map.addAttribute("article", article);
         map.addAttribute("articleComments", article.articleCommentResponse());
         map.addAttribute("articleFiles", articleFileService.getArticleFiles(articleId));
-        map.addAttribute("totalCount", articleService.getArticleCount());
+        map.addAttribute("previousArticleId", articleService.getPreviousArticleId(articleId));
+        map.addAttribute("nextArticleId", articleService.getNextArticleId(articleId));
         map.addAttribute("searchTypeHashtag", SearchType.HASHTAG);
 
         return "articles/detail";

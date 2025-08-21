@@ -5,6 +5,7 @@
 
     <attr sel="#article-main" th:object="${article}">
         <attr sel="#article-header/h1" th:text="*{title}" />
+        <attr sel="#article-id" th:text="*{id}" />
         <attr sel="#nickname" th:text="*{nickname}" />
         <attr sel="#email" th:text="*{email}" />
         <attr sel="#created-at" th:datetime="*{createdAt}" th:text="*{#temporals.format(createdAt, 'yyyy-MM-dd HH:mm:ss')}" />
@@ -51,12 +52,12 @@
     <attr sel="#pagination">
         <attr sel="ul">
             <attr sel="li[0]/a"
-                  th:href="*{id} - 1 <= 0 ? '#' : |/articles/*{id - 1}|"
-                  th:class="'page-link' + (*{id} - 1 <= 0 ? ' disabled' : '')"
+                  th:href="${previousArticleId} == null ? '#' : |/articles/${previousArticleId}|"
+                  th:class="'page-link' + (${previousArticleId} == null ? ' disabled' : '')"
             />
             <attr sel="li[1]/a"
-                  th:href="*{id} + 1 > ${totalCount} ? '#' : |/articles/*{id + 1}|"
-                  th:class="'page-link' + (*{id} + 1 > ${totalCount} ? ' disabled' : '')"
+                  th:href="${nextArticleId} == null ? '#' : |/articles/${nextArticleId}|"
+                  th:class="'page-link' + (${nextArticleId} == null ? ' disabled' : '')"
             />
         </attr>
     </attr>
