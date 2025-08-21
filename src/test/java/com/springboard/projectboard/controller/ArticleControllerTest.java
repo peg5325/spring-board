@@ -159,10 +159,10 @@ class ArticleControllerTest {
     public void givenNothing_whenRequestingArticleView_thenReturnsArticleView() throws Exception {
         // Given
         Long articleId = 1L;
-        Long totalCount = 1L;
 
         given(articleService.getArticleWithComments(articleId)).willReturn(createdArticleWithCommentsDto());
-        given(articleService.getArticleCount()).willReturn(totalCount);
+        given(articleService.getPreviousArticleId(articleId)).willReturn(null);
+        given(articleService.getNextArticleId(articleId)).willReturn(2L);
         given(articleFileService.getArticleFiles(articleId)).willReturn(List.of());
 
         // When & Then
@@ -173,11 +173,11 @@ class ArticleControllerTest {
                 .andExpect(model().attributeExists("article"))
                 .andExpect(model().attributeExists("articleComments"))
                 .andExpect(model().attributeExists("articleFiles"))
-                .andExpect(model().attribute("totalCount", totalCount))
                 .andExpect(model().attribute("searchTypeHashtag", SearchType.HASHTAG));
 
         then(articleService).should().getArticleWithComments(articleId);
-        then(articleService).should().getArticleCount();
+        then(articleService).should().getPreviousArticleId(articleId);
+        then(articleService).should().getNextArticleId(articleId);
         then(articleFileService).should().getArticleFiles(articleId);
     }
 
