@@ -26,6 +26,7 @@
         <div class="row g-5">
             <section class="col-md-3 col-lg-4 order-md-last">
                 <aside>
+                    <p><strong>게시글 번호:</strong> <span id="article-id">1</span></p>
                     <p><span id="nickname">Eongyu</span></p>
                     <p><a id="email" href="mailto:peg5325@gmail.com">peg5325@gmail.com</a></p>
                     <p><time id="created-at" datetime="2022-01-01T00:00:00">2022-01-01</time></p>
@@ -63,6 +64,7 @@
                 <div class="pb-5 d-grid gap-2 d-md-block">
                     <a class="btn btn-success me-md-2" role="button" id="update-article">수정</a>
                     <button class="btn btn-danger me-md-2" type="submit">삭제</button>
+                    <a class="btn btn-secondary me-md-2" href="/articles" role="button">목록</a>
                 </div>
             </form>
         </div>
@@ -120,8 +122,8 @@
         </div>
 
         <div class="row g-5">
-            <nav id="pagination" aria-label="Page navigation">
-                <ul class="pagination">
+            <nav id="pagination" aria-label="Page navigation" class="d-flex align-items-center">
+                <ul class="pagination mb-0 me-3">
                     <li class="page-item">
                         <a class="page-link" href="#" aria-label="Previous">
                             <span aria-hidden="true">&laquo; prev</span>
@@ -133,6 +135,7 @@
                         </a>
                     </li>
                 </ul>
+                <a class="btn btn-secondary" href="/articles" role="button">목록</a>
             </nav>
         </div>
 
@@ -165,6 +168,18 @@
             e.preventDefault();
             if (confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
                 this.submit();
+            }
+        });
+
+        // 목록 버튼 URL 설정
+        document.addEventListener('DOMContentLoaded', function() {
+            const listButtons = document.querySelectorAll('a[href="/articles"]');
+            const referrer = document.referrer;
+            
+            if (referrer && referrer.includes('/articles') && !referrer.includes('/articles/')) {
+                listButtons.forEach(button => {
+                    button.href = referrer;
+                });
             }
         });
     </script>

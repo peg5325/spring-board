@@ -27,6 +27,9 @@ public interface ArticleRepository extends
 
     void deleteByIdAndUserAccount_UserId(Long articleId, String userId);
 
+    java.util.Optional<Article> findTopByIdLessThanOrderByIdDesc(Long id);
+    java.util.Optional<Article> findTopByIdGreaterThanOrderByIdAsc(Long id);
+
     @Override
     default void customize(QuerydslBindings bindings, QArticle root) {
         bindings.excludeUnlistedProperties(true);

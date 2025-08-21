@@ -16,6 +16,12 @@
 
         <attr sel="#article-table">
             <attr sel="thead/tr">
+                <attr sel="th[0]/a" th:text="'번호'" th:href="@{/articles(
+                    page=${articles.number},
+                    sort='id' + (*{sort.getOrderFor('id')} != null ? (*{sort.getOrderFor('id').direction.name} != 'DESC' ? ',desc' : '') : ''),
+                    searchType=${param.searchType},
+                    searchValue=${param.searchValue}
+                )}"/>
                 <attr sel="th.title/a" th:text="'제목'" th:href="@{/articles(
                     page=${articles.number},
                     sort='title' + (*{sort.getOrderFor('title')} != null ? (*{sort.getOrderFor('title').direction.name} != 'DESC' ? ',desc' : '') : ''),
@@ -44,7 +50,7 @@
 
             <attr sel="tbody[0]" th:remove="all-but-first" th:if="${!articles.isEmpty()}">
                 <attr sel="tr[0]" th:each="article, iterStat : ${articles}">
-                    <attr sel="td[0]" th:text="${articles.totalElements - (articles.number * articles.size) - iterStat.index}" />
+                    <attr sel="td[0]" th:text="${article.id}" />
                     <attr sel="td.title">
                         <attr sel="a" th:text="${article.title}" th:href="@{'/articles/' + ${article.id}}" />
                         <attr sel="img" th:if="${article.hasFiles}" th:remove="${!article.hasFiles} ? 'all' : 'none'" />

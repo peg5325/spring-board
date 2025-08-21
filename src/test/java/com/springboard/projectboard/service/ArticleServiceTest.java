@@ -392,6 +392,74 @@ class ArticleServiceTest {
         then(hashtagRepository).should().findAllHashtagNames();
     }
 
+    @DisplayName("현재 게시글 ID를 입력하면, 이전 게시글 ID를 반환한다.")
+    @Test
+    void givenCurrentArticleId_whenGettingPreviousArticleId_thenReturnsPreviousArticleId() {
+        // Given
+        Long currentId = 5L;
+        Long expectedPreviousId = 3L;
+        Article previousArticle = createArticle(expectedPreviousId);
+
+        given(articleRepository.findTopByIdLessThanOrderByIdDesc(currentId)).willReturn(Optional.of(previousArticle));
+
+        // When
+        Long actualPreviousId = sut.getPreviousArticleId(currentId);
+
+        // Then
+        assertThat(actualPreviousId).isEqualTo(expectedPreviousId);
+        then(articleRepository).should().findTopByIdLessThanOrderByIdDesc(currentId);
+    }
+
+    @DisplayName("현재 게시글이 첫 번째 게시글이면, 이전 게시글 ID로 null을 반환한다.")
+    @Test
+    void givenFirstArticleId_whenGettingPreviousArticleId_thenReturnsNull() {
+        // Given
+        Long currentId = 1L;
+
+        given(articleRepository.findTopByIdLessThanOrderByIdDesc(currentId)).willReturn(Optional.empty());
+
+        // When
+        Long actualPreviousId = sut.getPreviousArticleId(currentId);
+
+        // Then
+        assertThat(actualPreviousId).isNull();
+        then(articleRepository).should().findTopByIdLessThanOrderByIdDesc(currentId);
+    }
+
+    @DisplayName("현재 게시글 ID를 입력하면, 다음 게시글 ID를 반환한다.")
+    @Test
+    void givenCurrentArticleId_whenGettingNextArticleId_thenReturnsNextArticleId() {
+        // Given
+        Long currentId = 5L;
+        Long expectedNextId = 7L;
+        Article nextArticle = createArticle(expectedNextId);
+
+        given(articleRepository.findTopByIdGreaterThanOrderByIdAsc(currentId)).willReturn(Optional.of(nextArticle));
+
+        // When
+        Long actualNextId = sut.getNextArticleId(currentId);
+
+        // Then
+        assertThat(actualNextId).isEqualTo(expectedNextId);
+        then(articleRepository).should().findTopByIdGreaterThanOrderByIdAsc(currentId);
+    }
+
+    @DisplayName("현재 게시글이 마지막 게시글이면, 다음 게시글 ID로 null을 반환한다.")
+    @Test
+    void givenLastArticleId_whenGettingNextArticleId_thenReturnsNull() {
+        // Given
+        Long currentId = 100L;
+
+        given(articleRepository.findTopByIdGreaterThanOrderByIdAsc(currentId)).willReturn(Optional.empty());
+
+        // When
+        Long actualNextId = sut.getNextArticleId(currentId);
+
+        // Then
+        assertThat(actualNextId).isNull();
+        then(articleRepository).should().findTopByIdGreaterThanOrderByIdAsc(currentId);
+    }
+
 
     private UserAccount createUserAccount() {
         return createUserAccount("eongyu");

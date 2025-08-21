@@ -141,6 +141,20 @@ public class ArticleService {
     }
 
     @Transactional(readOnly = true)
+    public Long getPreviousArticleId(Long currentId) {
+        return articleRepository.findTopByIdLessThanOrderByIdDesc(currentId)
+                .map(Article::getId)
+                .orElse(null);
+    }
+
+    @Transactional(readOnly = true)
+    public Long getNextArticleId(Long currentId) {
+        return articleRepository.findTopByIdGreaterThanOrderByIdAsc(currentId)
+                .map(Article::getId)
+                .orElse(null);
+    }
+
+    @Transactional(readOnly = true)
     public Page<ArticleDto> searchArticlesViaHashtag(String hashtagName, Pageable pageable) {
         if (hashtagName == null || hashtagName.isBlank()) {
             return Page.empty(pageable);
