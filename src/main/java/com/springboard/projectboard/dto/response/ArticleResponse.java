@@ -14,11 +14,12 @@ public record ArticleResponse(
         Set<String> hashtags,
         LocalDateTime createdAt,
         String email,
-        String nickname
+        String nickname,
+        boolean hasFiles
 ) {
 
-    public static ArticleResponse of(Long id, String title, String content, Set<String> hashtags, LocalDateTime createdAt, String email, String nickname) {
-        return new ArticleResponse(id, title, content, hashtags, createdAt, email, nickname);
+    public static ArticleResponse of(Long id, String title, String content, Set<String> hashtags, LocalDateTime createdAt, String email, String nickname, boolean hasFiles) {
+        return new ArticleResponse(id, title, content, hashtags, createdAt, email, nickname, hasFiles);
     }
 
     public static ArticleResponse from(ArticleDto dto) {
@@ -37,7 +38,8 @@ public record ArticleResponse(
                 ,
                 dto.createdAt(),
                 dto.userAccountDto().email(),
-                nickname
+                nickname,
+                false // 기본값, 필요시 별도 메서드로 설정
         );
     }
 }

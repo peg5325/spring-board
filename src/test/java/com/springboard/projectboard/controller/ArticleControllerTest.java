@@ -10,6 +10,7 @@ import com.springboard.projectboard.dto.UserAccountDto;
 import com.springboard.projectboard.dto.request.ArticleRequest;
 import com.springboard.projectboard.dto.response.ArticleResponse;
 import com.springboard.projectboard.service.ArticleService;
+import com.springboard.projectboard.service.ArticleFileService;
 import com.springboard.projectboard.service.PaginationService;
 import com.springboard.projectboard.util.FormDataEncoder;
 import org.junit.jupiter.api.Disabled;
@@ -49,6 +50,7 @@ class ArticleControllerTest {
     private final FormDataEncoder formDataEncoder;
 
     @MockBean private ArticleService articleService;
+    @MockBean private ArticleFileService articleFileService;
     @MockBean private PaginationService paginationService;
 
     public ArticleControllerTest(
@@ -161,6 +163,7 @@ class ArticleControllerTest {
 
         given(articleService.getArticleWithComments(articleId)).willReturn(createdArticleWithCommentsDto());
         given(articleService.getArticleCount()).willReturn(totalCount);
+        given(articleFileService.getArticleFiles(articleId)).willReturn(List.of());
 
         // When & Then
         mvc.perform(get("/articles/" + articleId))
@@ -169,11 +172,13 @@ class ArticleControllerTest {
                 .andExpect(view().name("articles/detail"))
                 .andExpect(model().attributeExists("article"))
                 .andExpect(model().attributeExists("articleComments"))
+                .andExpect(model().attributeExists("articleFiles"))
                 .andExpect(model().attribute("totalCount", totalCount))
                 .andExpect(model().attribute("searchTypeHashtag", SearchType.HASHTAG));
 
         then(articleService).should().getArticleWithComments(articleId);
         then(articleService).should().getArticleCount();
+        then(articleFileService).should().getArticleFiles(articleId);
     }
 
     @Disabled("구현 중")
@@ -304,6 +309,7 @@ class ArticleControllerTest {
         ArticleDto dto = createdArticleDto();
 
         given(articleService.getArticle(articleId)).willReturn(dto);
+        given(articleFileService.getArticleFiles(articleId)).willReturn(List.of());
 
         // When & Then
         mvc.perform(get("/articles/" + articleId + "/form"))
@@ -311,10 +317,12 @@ class ArticleControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/form"))
                 .andExpect(model().attribute("article", ArticleResponse.from(dto)))
+                .andExpect(model().attributeExists("articleFiles"))
                 .andExpect(model().attribute("formStatus", FormStatus.UPDATE))
         ;
 
         then(articleService).should().getArticle(articleId);
+        then(articleFileService).should().getArticleFiles(articleId);
     }
 
     @WithUserDetails(value = "eongyuTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)

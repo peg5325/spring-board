@@ -42,9 +42,13 @@
                 )}"/>
             </attr>
 
-            <attr sel="tbody" th:remove="all-but-first">
-                <attr sel="tr[0]" th:each="article : ${articles}">
-                    <attr sel="td.title/a" th:text="${article.title}" th:href="@{'/articles/' + ${article.id}}" />
+            <attr sel="tbody[0]" th:remove="all-but-first" th:if="${!articles.isEmpty()}">
+                <attr sel="tr[0]" th:each="article, iterStat : ${articles}">
+                    <attr sel="td[0]" th:text="${articles.totalElements - (articles.number * articles.size) - iterStat.index}" />
+                    <attr sel="td.title">
+                        <attr sel="a" th:text="${article.title}" th:href="@{'/articles/' + ${article.id}}" />
+                        <attr sel="img" th:if="${article.hasFiles}" th:remove="${!article.hasFiles} ? 'all' : 'none'" />
+                    </attr>
                     <attr sel="td.hashtag/span" th:each="hashtag : ${article.hashtags}">
                         <attr sel="a"
                               th:text="'#' + ${hashtag}"
@@ -55,6 +59,7 @@
                     <attr sel="td.created-at/time" th:datetime="${article.createdAt}" th:text="${#temporals.format(article.createdAt, 'yyyy-MM-dd')}" />
                 </attr>
             </attr>
+            <attr sel="tbody[1]" th:if="${articles.isEmpty()}" />
         </attr>
 
         <attr sel="#write-article" sec:authorize="isAuthenticated()" th:href="@{/articles/form}" />

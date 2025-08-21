@@ -17,6 +17,15 @@
         <attr sel="#article-content/pre" th:text="*{content}" />
     </attr>
 
+    <attr sel="#article-images" th:if="${articleFiles != null and !articleFiles.isEmpty()}">
+        <attr sel=".image-container" th:each="file : ${articleFiles}">
+            <attr sel="img" th:src="${file.s3Url}" th:alt="${file.originalFileName}" />
+            <attr sel="button" th:onclick="'downloadFile(' + ${file.id} + ')'" />
+        </attr>
+    </attr>
+
+    <attr sel="#article-images" th:remove="${articleFiles == null or articleFiles.isEmpty()} ? 'all' : 'none'" />
+
     <attr sel="#article-buttons" th:if="${#authorization.expression('isAuthenticated()')} and *{userId} == ${#authentication.name}">
         <attr sel="#delete-article-form" th:action="'/articles/' + *{id} + '/delete'" th:method="post">
             <attr sel="#update-article" th:href="'/articles/' + *{id} + '/form'" />

@@ -10,4 +10,17 @@
         <attr sel="#submit-button" th:text="${formStatus?.description} ?: _" />
         <attr sel="#cancel-button" th:onclick="'history.back()'" />
     </attr>
+
+    <attr sel="meta[name='_csrf']" th:content="${_csrf.token}" />
+    <attr sel="meta[name='_csrf_header']" th:content="${_csrf.headerName}" />
+
+    <attr sel="#existing-files-section" th:if="${articleFiles != null and !articleFiles.isEmpty()}">
+        <attr sel=".existing-file-item" th:each="file : ${articleFiles}">
+            <attr sel="img" th:src="${file.s3Url}" th:alt="${file.originalFileName}" />
+            <attr sel="button" th:onclick="'deleteExistingFile(' + ${file.id} + ')'" />
+            <attr sel="small" th:text="${file.originalFileName}" th:title="${file.originalFileName}" />
+        </attr>
+    </attr>
+
+    <attr sel="#existing-files-section" th:remove="${articleFiles == null or articleFiles.isEmpty()} ? 'all' : 'none'" />
 </thlogic>

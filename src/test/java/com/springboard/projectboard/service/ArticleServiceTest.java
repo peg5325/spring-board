@@ -54,6 +54,9 @@ class ArticleServiceTest {
     @Mock
     private HashtagRepository hashtagRepository;
 
+    @Mock
+    private ArticleFileService articleFileService;
+
 
     @DisplayName("검색어 없이 게시글을 검색하면, 게시글 페이지를 반환한다.")
     @Test
@@ -341,6 +344,7 @@ class ArticleServiceTest {
         String userId = "eongyu";
 
         given(articleRepository.getReferenceById(articleId)).willReturn(createArticle());
+        willDoNothing().given(articleFileService).deleteArticleFiles(articleId);
         willDoNothing().given(articleRepository).deleteByIdAndUserAccount_UserId(articleId, userId);
         willDoNothing().given(articleRepository).flush();
         willDoNothing().given(hashtagService).deleteHashtagWithoutArticles(any());
@@ -350,6 +354,7 @@ class ArticleServiceTest {
 
         // Then
         then(articleRepository).should().getReferenceById(articleId);
+        then(articleFileService).should().deleteArticleFiles(articleId);
         then(articleRepository).should().deleteByIdAndUserAccount_UserId(articleId, userId);
         then(articleRepository).should().flush();
         then(hashtagService).should(times(2)).deleteHashtagWithoutArticles(any());

@@ -6,6 +6,8 @@
     <meta name="description" content="">
     <meta name="author" content="Uno Kim">
     <title>새 게시글 등록</title>
+    <meta name="_csrf" content=""/>
+    <meta name="_csrf_header" content=""/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
 </head>
 
@@ -20,7 +22,7 @@
             <h1>게시글 작성</h1>
         </header>
 
-        <form id="article-form">
+        <form id="article-form" enctype="multipart/form-data">
             <div class="row mb-3 justify-content-md-center">
                 <label for="title" class="col-sm-2 col-lg-1 col-form-label text-sm-end">제목</label>
                 <div class="col-sm-8 col-lg-9">
@@ -32,6 +34,37 @@
                 <label for="content" class="col-sm-2 col-lg-1 col-form-label text-sm-end">본문</label>
                 <div class="col-sm-8 col-lg-9">
                     <textarea class="form-control" id="content" name="content" rows="5" required></textarea>
+                </div>
+            </div>
+
+            <div class="row mb-3 justify-content-md-center" id="existing-files-section">
+                <label class="col-sm-2 col-lg-1 col-form-label text-sm-end">기존 이미지</label>
+                <div class="col-sm-8 col-lg-9">
+                    <div class="d-flex flex-wrap gap-3">
+                        <div class="existing-file-item" style="position: relative; display: inline-block;">
+                            <div class="position-relative d-inline-block">
+                                <img src="" class="img-thumbnail" style="width: 100px; height: 75px; object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-danger btn-sm position-absolute" 
+                                        style="top: -8px; right: -8px; padding: 2px 6px; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                                    <span aria-hidden="true" style="font-size: 12px;">&times;</span>
+                                </button>
+                            </div>
+                            <div class="mt-1 text-start" style="width: 100px;">
+                                <small class="text-muted text-truncate d-block" title="filename">filename</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3 justify-content-md-center">
+                <label for="files" class="col-sm-2 col-lg-1 col-form-label text-sm-end">새 이미지</label>
+                <div class="col-sm-8 col-lg-9">
+                    <input type="file" name="files" multiple accept=".jpg,.jpeg,.png,.gif,.tiff,.tif,.raw" class="form-control" id="files">
+                    <div class="form-text">최대 5개, 각 10MB 이하 (JPG, JPEG, PNG, GIF, TIFF, TIF, RAW)</div>
+                    <div id="filePreview" class="mt-2">
+                        <!-- 새 파일 미리보기가 여기에 표시됩니다 -->
+                    </div>
                 </div>
             </div>
 
@@ -50,5 +83,115 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+    <script>
+        // 기존 파일 삭제 함수
+        function deleteExistingFile(fileId) {
+            if (confirm('이 파일을 삭제하시겠습니까?')) {
+                const token = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+                const header = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+                
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                
+                if (token && header) {
+                    headers[header] = token;
+                }
+                
+                fetch(`/files/${fileId}`, {
+                    method: 'DELETE',
+                    headers: headers
+                })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('파일 삭제에 실패했습니다.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('파일 삭제 중 오류가 발생했습니다.');
+                });
+            }
+        }
+
+        let selectedFiles = [];
+        
+        document.getElementById('files').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            const existingFileCount = document.querySelectorAll('.existing-file-item').length;
+            const totalFileCount = existingFileCount + files.length;
+            
+            if (totalFileCount > 5) {
+                alert(`최대 5개의 파일만 업로드 가능합니다. (기존: ${existingFileCount}개, 새 파일: ${files.length}개)`);
+                e.target.value = '';
+                return;
+            }
+            
+            for (let file of files) {
+                if (file.size > 10 * 1024 * 1024) {
+                    alert(`${file.name}은 10MB를 초과합니다.`);
+                    e.target.value = '';
+                    return;
+                }
+            }
+            
+            selectedFiles = files;
+            updateFilePreview();
+        });
+        
+        function updateFilePreview() {
+            const preview = document.getElementById('filePreview');
+            const existingFileCount = document.querySelectorAll('.existing-file-item').length;
+            const totalFileCount = existingFileCount + selectedFiles.length;
+            
+            preview.innerHTML = '';
+            
+            // 총 파일 개수 표시
+            if (selectedFiles.length > 0) {
+                const countInfo = document.createElement('div');
+                countInfo.className = 'text-muted mb-2';
+                countInfo.textContent = `총 파일 개수: ${totalFileCount}/5`;
+                preview.appendChild(countInfo);
+            }
+            
+            selectedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'alert alert-info d-flex justify-content-between align-items-center';
+                
+                const fileInfo = document.createElement('span');
+                fileInfo.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`;
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'btn btn-sm btn-outline-danger';
+                removeBtn.innerHTML = '&times;';
+                removeBtn.onclick = () => removeFile(index);
+                
+                fileItem.appendChild(fileInfo);
+                fileItem.appendChild(removeBtn);
+                preview.appendChild(fileItem);
+            });
+            
+            updateFileInput();
+        }
+        
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            updateFilePreview();
+        }
+        
+        function updateFileInput() {
+            const fileInput = document.getElementById('files');
+            const dt = new DataTransfer();
+            
+            selectedFiles.forEach(file => {
+                dt.items.add(file);
+            });
+            
+            fileInput.files = dt.files;
+        }
+    </script>
 </body>
 </html>
