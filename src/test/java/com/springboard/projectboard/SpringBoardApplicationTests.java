@@ -2,9 +2,15 @@ package com.springboard.projectboard;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
-@SpringBootTest(properties = "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration")
+import javax.sql.DataSource;
+
+@SpringBootTest
 class SpringBoardApplicationTests {
+
+	@MockBean
+	private DataSource dataSource;
 
 	@Test
 	void contextLoads() {
